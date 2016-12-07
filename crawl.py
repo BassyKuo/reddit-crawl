@@ -27,6 +27,10 @@ def url2json (url):
 			# print "urllib2.HTTPError: %s timeout error. Try again." % url
 		print "urllib2.HTTPError: %s caused error. Try again." % url
 		return url2json(url)
+	except urllib2.URLError, e:
+		if 'timed out' in str(e):
+			print "urllib2.URLError: %s caused timeout. Try again." % url
+			return url2json(url)
 
 def fetch_comment (comment, dic, level, num):
 	"""
