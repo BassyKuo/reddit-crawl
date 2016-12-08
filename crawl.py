@@ -20,14 +20,14 @@ def url2json (url):
 		respond = urllib2.urlopen(request)
 		content = json.loads(respond.read())
 		return content
-	except urllib2.HTTPError, e:
+	except urllib2.HTTPError as e:
 		if '404' in str(e) or '403' in str(e):
 			return -1
 		# elif '503' in str(e):
 			# print "urllib2.HTTPError: %s timeout error. Try again." % url
 		print "urllib2.HTTPError: %s caused error. Try again." % url
 		return url2json(url)
-	except urllib2.URLError, e:
+	except urllib2.URLError as e:
 		if 'timed out' in str(e):
 			print "urllib2.URLError: %s caused timeout. Try again." % url
 			return url2json(url)
@@ -130,10 +130,13 @@ class RedditObj:
 								"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36")
 			respond = urllib2.urlopen(request)
 			self.contents = json.loads(respond.read())
-			self.page_len = len(self.contents['data']['children'])
 			self.after = self.contents['data']['after']
+			try:
+				self.page_len = len(self.contents['data']['children'])
+			except TypeError:
+				self.page_len = 0
 			return self.contents
-		except urllib2.HTTPError, e:
+		except urllib2.HTTPError as e:
 			if '404' in str(e) or '403' in str(e):
 				return -1
 			print "urllib2.HTTPError: %s caused error. Try again." % url
@@ -344,7 +347,7 @@ class RedditUser:
 			self.page_len = len(self.contents['data']['children'])
 			self.after = self.contents['data']['after']
 			return self.contents
-		except urllib2.HTTPError, e:
+		except urllib2.HTTPError as e:
 			if '404' in str(e) or '403' in str(e):
 				return -1
 			print "urllib2.HTTPError: %s caused error. Try again." % url
