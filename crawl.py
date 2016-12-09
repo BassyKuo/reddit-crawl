@@ -84,27 +84,30 @@ class RedditObj:
 
 	def __init__ (self, domain='http://www.reddit.com/r/nosleep/', count=0, name=''):
 		"""
-		Init:	dic, domain, next_count (`count` in url), next_name (`after` in url), next_url, a_count, key_list
+		Object Variables: contents, dic, domain, 
+		                  next_count (`count` in url), next_name (`after` in url), next_url, 
+		                  a_count, key_list
 		
 		dic = {
-			'domain' : 'http://www.reddit.com/r/nosleep/', 
-			'next_count' : 75,
-			'next_name' : 'ttrr4'
-			'next_url' : 'http://www.reddit.com/r/nosleep/.json?count=75&after=ttrr4'
-			'articles' : {
-				"$username_1" : {
-					"$article_id_1" : { 'title' , 'link_flair_text' , 'score' , 'ups' , 
-					                    'created_utc' , 'edited' , 'num_comments' , 'selftext' , 'preview' , 
-					                    'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' },
-					"$article_id_2" : {...},
-				},
-				"$username_2" : {
-				        "$article_id_1" : {...},
-				        "$article_id_2" : {...},
-			        ...
-			        }
-				"$username_3"...
+		  'domain' : 'http://www.reddit.com/r/nosleep/', 
+		  'a_count' : 60,
+		  'next_count' : 75,
+		  'next_name' : 'ttrr4'
+		  'next_url' : 'http://www.reddit.com/r/nosleep/.json?count=75&after=ttrr4'
+		  'articles' : {
+		    "$username_1" : {
+		      "$article_id_1" : { 'title' , 'link_flair_text' , 'score' , 'ups' , 
+		                          'created_utc' , 'edited' , 'num_comments' , 'selftext' , 'preview' , 
+		                          'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' },
+		      "$article_id_2" : {...},
+		    },
+		    "$username_2" : {
+		      "$article_id_1" : {...},
+		      "$article_id_2" : {...},
+		       ...
 		    }
+		    "$username_3"...
+		  }
 		}
 		"""
 		self.domain = domain
@@ -112,9 +115,10 @@ class RedditObj:
 		self.next_count = count
 		self.next_name = name
 		self.next_url = self.domain + ".json?count=" + str(self.next_count) + "&after=" + self.next_name
-		self.dic = {'domain':self.domain, 'next_count':self.next_count, 'next_name':self.next_name, 'next_url':self.next_url, 'articles':{}}
-		self.key_list = ['title', 'link_flair_text', 'score', 'ups', 'created_utc', 'edited', 'num_comments', 'selftext', 'preview', 
-						 'media', 'over_18', 'domain', 'subreddit', 'url', 'name']
+		self.dic = {'domain':self.domain, 'a_count': self.a_count, 'next_count':self.next_count, 
+					'next_name':self.next_name, 'next_url':self.next_url, 'articles':{}}
+		self.key_list = ['title', 'link_flair_text', 'score', 'ups', 'created_utc', 'edited', 'num_comments', 
+						 'selftext', 'preview', 'media', 'over_18', 'domain', 'subreddit', 'url', 'name']
 		"""
 		PS. the key 'preview' is NOT in every subreddits
 		"""
@@ -231,7 +235,7 @@ class RedditObj:
 		self.dic['a_count'] = self.a_count
 		self.dic['next_count'] = self.next_count
 		self.dic['next_name'] = self.next_name
-		self.dic['next_url'] = self.domain + ".json?count=" + str(article.next_count) + "&after=" + self.next_name
+		self.dic['next_url'] = self.domain + ".json?count=" + str(self.next_count) + "&after=" + self.next_name
 		if dic=={}:
 			dic = self.dic
 		with open(filename, 'w') as outfile:
@@ -514,12 +518,14 @@ if __name__ == '__main__':
 
 	article.writeJSON(filename_sum)
 
-	with open('reddit_users.txt', 'a') as f:
+	with open('reddit_users.txt.1', 'a') as f:
 		for user in article.authors():
 			f.write("%s\n" % user)
 			for a_id in article.ids(user):
-				author = article.getitem(user, a_id, 'comments')
-				f.write("%s\n" % author)
+				for cname in article.dic['articles'][user][a_id]['comments'].keys():
+					if article.dic['articles'][user][a_id]['comments'].has_key('author'):
+						author = article.dic['articles'][user][a_id]['comments'][cname]['author']
+						f.write("%s\n" % author)
 	f.close()
 
 
