@@ -178,8 +178,9 @@ class RedditObj:
 			try:
 				author = self.contents['data']['children'][num]['data']['author']
 				a_id = self.contents['data']['children'][num]['data']['id']
+				subreddit = self.contents['data']['children'][num]['data']['subreddit']
 				# c_url = self.contents['data']['children'][num]['data']['url']
-				c_url = urljoin (self.domain, "comments", a_id, ".json")
+				c_url = urljoin ("https://www.reddit.com/r/", subreddit, "comments", a_id, ".json")
 				dic[author] = {}
 				dic[author][a_id] = {}
 				for k in self.key_list:
@@ -195,7 +196,7 @@ class RedditObj:
 			except IndexError:
 				print "Failed: %s is empty." % self.url
 				return -1
-		self.update(dic)
+			self.update(dic)
 		return dic
 
 	def authors (self):
@@ -273,7 +274,6 @@ class RedditObj:
 					else:
 						print "\t%s:\t%s" % (item, self.dic['articles'][author][a_id][item])
 
-
 	def update (self, new_dic):
 		"""
 		x.update(new_dic['articles'])    -- update this RedditObj articles information 
@@ -282,22 +282,27 @@ class RedditObj:
 		                                                       '$author2': {....}, ... 
 		                                                  }                       
 		"""
+		if new_dic.has_key('articles') is True:
+			print "Failed: new_dic should NOT have the key 'articles'."
+			print "         > That is: `new_dic = { '$author_1': ..., '$author_2', ... }"
+			return -1
 		for author in new_dic.keys():
 			if self.dic['articles'].has_key(author) == False:
 				self.dic['articles'][author] = {}
 			self.dic['articles'][author].update(new_dic[author])
 
-class RedditUser:
+class RedditUser (RedditObj):
 	"""
 	< Reddit Users Object >
 	Usage:
-	 obj = RedditUser(username)
-	 obj.url2json(obj.next_url)
-	 obj.get_content(0, obj.page_len)
-	 obj.next_page()
-	 obj.get_content(0, obj.page_len)
-	 obj.next_page()
-	 obj.writeJSON('reddit_user_output.json')
+	  obj = RedditUser(username)
+	  obj.url2json(obj.next_url)
+	  obj.get_content(0, obj.page_len)
+	  obj.next_page()
+	  obj.get_content(0, obj.page_len)
+	  obj.next_page()
+	  obj.writeJSON('reddit_user_output.json')
+	 ----------------------------------------------------
 	"""
 	def __init__ (self, user=''):
 		"""
@@ -337,26 +342,6 @@ class RedditUser:
 						 'media', 'over_18', 'domain', 'subreddit', 'url', 'name']
 		""" [EX] 'subreddit' : nosleep / jokes / NoSleepOOC, ..... """
 
-	def url2json (self, url):
-		"""
-		x.url2json(x.next_url)    -- return json_content
-		"""
-		try:
-			self.url = url
-			request = urllib2.Request(url)
-			request.add_header( "User-Agent",
-								"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36")
-			respond = urllib2.urlopen(request)
-			self.contents = json.loads(respond.read())
-			self.page_len = len(self.contents['data']['children'])
-			self.after = self.contents['data']['after']
-			return self.contents
-		except urllib2.HTTPError as e:
-			if '404' in str(e) or '403' in str(e):
-				return -1
-			print "urllib2.HTTPError: %s caused error. Try again." % url
-			return self.url2json(url)
-
 	def next_page (self):
 		"""
 		x.next_page()    -- update next page information (count, after, url), and return next_url (-1: false)
@@ -371,62 +356,62 @@ class RedditUser:
 		self.next_url = url
 		return self.next_url
 
-	def get_content (self, start=0, end=0):
-		"""
-		x.get_content(5, 7)         # return id=5,6 contents
-		x.get_content(0, x.page_len)   # return all contents
-		    -- return json_content from `start` to `end`, and store in RedditObj.dic
-		"""
-		if end == 0:
-			end = start + 1
-		elif end > self.page_len or end <= start:
-			print "Error: start < `end' <= count"
-			return -1
-		dic = {}
-		#print "start: " +  str(start)
-		#print "end: " + str(end)
-		for num in range(start, end):
-			try:
-				author = self.contents['data']['children'][num]['data']['author']
-				a_id = self.contents['data']['children'][num]['data']['id']
-				dic[author] = {}
-				dic[author][a_id] = {}
-				for k in self.key_list:
-					if self.contents['data']['children'][num]['data'].has_key(k) is True:
-						dic[author][a_id][k] = self.contents['data']['children'][num]['data'][k]
-					else:
-						dic[author][a_id][k] = None
-				#print dic
-				self.a_count += 1
-			except IndexError:
-				print "Failed: %s is empty." % self.url
-				return -1
-		self.update(dic)
-		return dic
+	# def get_content (self, start=0, end=0):
+		# """
+		# x.get_content(5, 7)         # return id=5,6 contents
+		# x.get_content(0, x.page_len)   # return all contents
+			# -- return json_content from `start` to `end`, and store in RedditObj.dic
+		# """
+		# if end == 0:
+			# end = start + 1
+		# elif end > self.page_len or end <= start:
+			# print "Error: start < `end' <= count"
+			# return -1
+		# dic = {}
+		# #print "start: " +  str(start)
+		# #print "end: " + str(end)
+		# for num in range(start, end):
+			# try:
+				# author = self.contents['data']['children'][num]['data']['author']
+				# a_id = self.contents['data']['children'][num]['data']['id']
+				# dic[author] = {}
+				# dic[author][a_id] = {}
+				# for k in self.key_list:
+					# if self.contents['data']['children'][num]['data'].has_key(k) is True:
+						# dic[author][a_id][k] = self.contents['data']['children'][num]['data'][k]
+					# else:
+						# dic[author][a_id][k] = None
+				# #print dic
+				# self.a_count += 1
+			# except IndexError:
+				# print "Failed: %s is empty." % self.url
+				# return -1
+		# self.update(dic)
+		# return dic
 
-	def authors (self):
-		"""
-		x.authors()    -- list all authors in RedditObj
-		"""
-		return self.dic['articles'].keys()
+	# def authors (self):
+		# """
+		# x.authors()    -- list all authors in RedditObj
+		# """
+		# return self.dic['articles'].keys()
 
-	def ids (self, author):
-		"""
-		x.ids(author)    -- list all `article_id` of author in RedditObj
-		"""
-		return self.dic['articles'][author].keys()
+	# def ids (self, author):
+		# """
+		# x.ids(author)    -- list all `article_id` of author in RedditObj
+		# """
+		# return self.dic['articles'][author].keys()
 
-	def keys (self):
-		"""
-		x.keys()    -- list all attributes(keys) in RedditObj.dic['artciles']
-		"""
-		return self.key_list
+	# def keys (self):
+		# """
+		# x.keys()    -- list all attributes(keys) in RedditObj.dic['artciles']
+		# """
+		# return self.key_list
 
-	def getitem (self, author, a_id, attr):
-		"""
-		x.getitem(author, a_id, attr)    -- return the value in RedditObj.dic['articles'][author][a_id][attr] 
-		"""
-		return self.dic['articles'][author][a_id][attr]
+	# def getitem (self, author, a_id, attr):
+		# """
+		# x.getitem(author, a_id, attr)    -- return the value in RedditObj.dic['articles'][author][a_id][attr] 
+		# """
+		# return self.dic['articles'][author][a_id][attr]
 
 	def writeJSON (self, filename="reddit_user.json", dic={}):
 		"""
@@ -472,7 +457,7 @@ class RedditUser:
 			print "         > That is: `new_dic = { '$author_1': ..., '$author_2', ... }"
 			return -1
 		for author in new_dic.keys():
-			if self.dic['articles'].has_key(author) is False:
+			if self.dic['articles'].has_key(author) == False:
 				self.dic['articles'][author] = {}
 			self.dic['articles'][author].update(new_dic[author])
 
