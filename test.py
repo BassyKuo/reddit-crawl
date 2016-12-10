@@ -4,7 +4,7 @@ import	requests
 import	datetime
 #from pprint import pprint
 
-from crawl import RedditObj
+from Reddit_crawler import RedditObj
 
 filename ='data/reddit_nosleep_1204.json'
 article_old = RedditObj()
