@@ -48,13 +48,9 @@ def fetch_comment (comment, dic, level, num):
 	comment[c_name] = {}
 	comment[c_name]['child_id'] = {}
 	comment[c_name]['level'] = level
-	# print c_name
-	# print dic['data']['children'][num]['data'].keys()
 	for item in dic['data']['children'][num]['data'].keys():
 		if item != 'replies' and item != 'body_html':
 			comment[c_name][item] = dic['data']['children'][num]['data'][item]
-	# for item in comment[c_name].keys():
-		# print "\t%s:\t%s" % (item, comment[c_name][item])
 	if dic['data']['children'][num]['data'].has_key('replies') and dic['data']['children'][num]['data']['replies'] != '':
 		comment[c_name]['child_id'] = {
 			dic['data']['children'][num]['data']['replies']['data']['children'][i]['data']['name']:'' 
@@ -510,10 +506,14 @@ if __name__ == '__main__':
 		for user in article.authors():
 			f.write("%s\n" % user)
 			for a_id in article.ids(user):
-				for cname in article.dic['articles'][user][a_id]['comments'].keys():
-					if article.dic['articles'][user][a_id]['comments'].has_key('author'):
-						author = article.dic['articles'][user][a_id]['comments'][cname]['author']
-						f.write("%s\n" % author)
+				# if article.dic['articles'][user][a_id].has_key('comments'):
+				try:
+					for cname in article.dic['articles'][user][a_id]['comments'].keys():
+						if article.dic['articles'][user][a_id]['comments'].has_key('author'):
+							author = article.dic['articles'][user][a_id]['comments'][cname]['author']
+							f.write("%s\n" % author)
+				except KeyError as err:
+					print "Failed: %s %s" % (article.domain, err)
 	f.close()
 
 
