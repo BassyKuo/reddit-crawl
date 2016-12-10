@@ -1,3 +1,32 @@
+#!/bin/python 
+#####
+# Filename: Reddit_crawler.py
+# Author: Bassy <aaammmyyy27@gmail.com>
+# NTHU_ID: 105062633 <bassykuo@gapp.nthu.edu.tw> 
+# Date: 2016-12-10
+# Class: RedditObj, RedditUser
+# Class Usage:
+# [example#1]
+#   from Reddit_crawler import *
+#   obj = RedditObj('https://www.reddit.com/r/nosleep/.json')
+#   obj.url2json(obj.url)
+#   obj.get_content(0, obj.page_len)
+#   obj.show()
+#   obj.writeJSON('data/reddit_nosleep.json')
+#   article = obj.get_dict()
+#   a    = obj.authors()[0]
+#   a_id = obj.ids(a)[0]
+#   print obj.keys('articles')
+#   print article[a][a_id]['body']
+# [example#2]
+#   from Reddit_crawler import *
+#   obj = RedditUser()
+#   obj.readJSON('data/user/reddit_Amy.json')
+#   obj.show()
+# Main Usage:
+#   python Reddit_crawler.py https://www.reddit.com/r/nosleep/ data
+#####
+
 import	urllib,urllib2
 import	json
 import	requests
@@ -94,7 +123,46 @@ class RedditObj:
 		    "$username_1" : {
 		      "$article_id_1" : { 'title' , 'link_flair_text' , 'score' , 'ups' , 
 		                          'created_utc' , 'edited' , 'num_comments' , 'selftext' , 'preview' , 
-		                          'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' },
+		                          'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' ,
+		                          'comments' : { 
+		                            "$comment_name_1" : {
+		                               'subreddit_id' , 
+		                               'banned_by' , 
+		                               'removal_reason' , 
+		                               'link_id' , 
+		                               'likes' , 
+		                               'user_reports' , 
+		                               'child_id' , 
+		                               'saved' , 
+		                               'id' , 
+		                               'gilded' , 
+		                               'archived' , 
+		                               'stickied' , 
+		                               'author' , 
+		                               'parent_id' , 
+		                               'score' , 
+		                               'approved_by' , 
+		                               'controversiality' , 
+		                               'body' , 
+		                               'edited' , 
+		                               'author_flair_css_class' , 
+		                               'downs' , 
+		                               'subreddit' , 
+		                               'name' , 
+		                               'score_hidden' , 
+		                               'report_reasons' , 
+		                               'level' , 
+		                               'author_flair_text' , 
+		                               'created' , 
+		                               'created_utc' , 
+		                               'distinguished' , 
+		                               'mod_reports' , 
+		                               'num_reports' , 
+		                               'ups'
+		                            },
+		                            "$comment_name_2" : { ... }
+		                          }
+		                        },
 		      "$article_id_2" : {...},
 		    },
 		    "$username_2" : {
@@ -102,7 +170,6 @@ class RedditObj:
 		      "$article_id_2" : {...},
 		       ...
 		    }
-		    "$username_3"...
 		  }
 		}
 		"""
@@ -207,15 +274,33 @@ class RedditObj:
 		"""
 		return self.dic['articles'][author].keys()
 
-	def keys (self):
+	def keys (self,type='articles'):
 		"""
-		x.keys()    -- list all attributes(keys) in RedditObj.dic['artciles']
+		x.keys('articles')    -- list all attributes(keys) in RedditObj.dic['artciles']
+		[NOTICE]: type = {'articles'|'comments'}
 		"""
-		return self.key_list
+		if type == 'articles':
+			keys = self.key_list
+			keys.append('comments')
+		elif type == 'comments':
+			keys = ['subreddit_id', 'banned_by', 'removal_reason', 'link_id', 'likes', 'user_reports', 
+					'child_id', 'saved', 'id', 'gilded', 'archived', 'stickied', 'author', 'parent_id', 
+					'score', 'approved_by', 'controversiality', 'body', 'edited', 'author_flair_css_class', 
+					'downs', 'subreddit', 'name', 'score_hidden', 'report_reasons', 'level', 'author_flair_text', 
+					'created', 'created_utc', 'distinguished', 'mod_reports', 'num_reports', 'ups']
+		return keys
+
+	def get_dict (self):
+		"""
+		x.get_dict()    -- return RedditObj.dic['articles']
+		"""
+		return self.dic['articles']
 
 	def getitem (self, author, a_id, attr):
 		"""
 		x.getitem(author, a_id, attr)    -- return the value in RedditObj.dic['articles'][author][a_id][attr] 
+
+		[NOTICE]: using `x.authors`, `x.ids` to get the target author and article_id first
 		"""
 		return self.dic['articles'][author][a_id][attr]
 
@@ -305,26 +390,64 @@ class RedditUser (RedditObj):
 		Init:	dic, domain, a_count, url, next_count (`count` in url), next_name (`after` in url), next_url, key_list
 
 		dic = {
-			'domain' : 'http://www.reddit.com/user/',
-			'url' : 'http://www.reddit.com/user/Amy/submitted/.json'
-			'next_count' : 75,
-			'next_name' : 'ttrr4'
-			'next_url' : 'http://www.reddit.com/user/submitted/.json?after=ttrr4'
-			'articles' : {
-				"$username_1" : {
-					"$article_id_1" : { 'title' , 'link_flair_text' , 'score' , 'ups' , 
-					                    'created_utc' , 'edited' , 'num_comments' , 'selftext' , 'preview' , 
-					                    'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' },
-					"$article_id_2" : {...},
-				},
-				"$username_2" : {
-				        "$article_id_1" : {...},
-				        "$article_id_2" : {...},
-			        ...
-			        }
-				"$username_3"...
+		  'domain' : 'http://www.reddit.com/user/',
+		  'url' : 'http://www.reddit.com/user/Amy/submitted/.json'
+		  'next_count' : 75,
+		  'next_name' : 'ttrr4'
+		  'next_url' : 'http://www.reddit.com/user/submitted/.json?after=ttrr4'
+		  'articles' : {
+		    "$username_1" : {
+		      "$article_id_1" : { 'title' , 'link_flair_text' , 'score' , 'ups' , 
+		                          'created_utc' , 'edited' , 'num_comments' , 'selftext' , 'preview' , 
+		                          'media' , 'over_18' , 'domain' , 'subreddit' , 'url' , 'name' ,
+		                          'comments' : { 
+		                            "$comment_name_1" : {
+		                               'subreddit_id' , 
+		                               'banned_by' , 
+		                               'removal_reason' , 
+		                               'link_id' , 
+		                               'likes' , 
+		                               'user_reports' , 
+		                               'child_id' , 
+		                               'saved' , 
+		                               'id' , 
+		                               'gilded' , 
+		                               'archived' , 
+		                               'stickied' , 
+		                               'author' , 
+		                               'parent_id' , 
+		                               'score' , 
+		                               'approved_by' , 
+		                               'controversiality' , 
+		                               'body' , 
+		                               'edited' , 
+		                               'author_flair_css_class' , 
+		                               'downs' , 
+		                               'subreddit' , 
+		                               'name' , 
+		                               'score_hidden' , 
+		                               'report_reasons' , 
+		                               'level' , 
+		                               'author_flair_text' , 
+		                               'created' , 
+		                               'created_utc' , 
+		                               'distinguished' , 
+		                               'mod_reports' , 
+		                               'num_reports' , 
+		                               'ups'
+		                            },
+		                            "$comment_name_2" : { ... }
+		                          }
+		                        },
+		        "$article_id_2" : {...},
+		      },
+		      "$username_2" : {
+		        "$article_id_1" : {...},
+		        "$article_id_2" : {...},
+		        ...
+		      }
 		    }
-		}
+		  }
 		"""
 		self.user = user
 		self.domain = 'https://www.reddit.com/user/' 
@@ -351,63 +474,6 @@ class RedditUser (RedditObj):
 		self.next_name = name
 		self.next_url = url
 		return self.next_url
-
-	# def get_content (self, start=0, end=0):
-		# """
-		# x.get_content(5, 7)         # return id=5,6 contents
-		# x.get_content(0, x.page_len)   # return all contents
-			# -- return json_content from `start` to `end`, and store in RedditObj.dic
-		# """
-		# if end == 0:
-			# end = start + 1
-		# elif end > self.page_len or end <= start:
-			# print "Error: start < `end' <= count"
-			# return -1
-		# dic = {}
-		# #print "start: " +  str(start)
-		# #print "end: " + str(end)
-		# for num in range(start, end):
-			# try:
-				# author = self.contents['data']['children'][num]['data']['author']
-				# a_id = self.contents['data']['children'][num]['data']['id']
-				# dic[author] = {}
-				# dic[author][a_id] = {}
-				# for k in self.key_list:
-					# if self.contents['data']['children'][num]['data'].has_key(k) is True:
-						# dic[author][a_id][k] = self.contents['data']['children'][num]['data'][k]
-					# else:
-						# dic[author][a_id][k] = None
-				# #print dic
-				# self.a_count += 1
-			# except IndexError:
-				# print "Failed: %s is empty." % self.url
-				# return -1
-		# self.update(dic)
-		# return dic
-
-	# def authors (self):
-		# """
-		# x.authors()    -- list all authors in RedditObj
-		# """
-		# return self.dic['articles'].keys()
-
-	# def ids (self, author):
-		# """
-		# x.ids(author)    -- list all `article_id` of author in RedditObj
-		# """
-		# return self.dic['articles'][author].keys()
-
-	# def keys (self):
-		# """
-		# x.keys()    -- list all attributes(keys) in RedditObj.dic['artciles']
-		# """
-		# return self.key_list
-
-	# def getitem (self, author, a_id, attr):
-		# """
-		# x.getitem(author, a_id, attr)    -- return the value in RedditObj.dic['articles'][author][a_id][attr] 
-		# """
-		# return self.dic['articles'][author][a_id][attr]
 
 	def writeJSON (self, filename="reddit_user.json", dic={}):
 		"""
@@ -440,23 +506,6 @@ class RedditUser (RedditObj):
 		infile.close()
 		return self.dic
 
-	def update (self, new_dic):
-		"""
-		x.update(new_dic['articles'])    -- update this RedditObj articles information 
-		                                     if new_dic = {'articles': 
-		                                                       '$author1': { '$a_id11':..., '$a_id12':... },
-		                                                       '$author2': {....}, ... 
-		                                                  }                       
-		"""
-		if new_dic.has_key('articles') is True:
-			print "Failed: new_dic should NOT have the key 'articles'."
-			print "         > That is: `new_dic = { '$author_1': ..., '$author_2', ... }"
-			return -1
-		for author in new_dic.keys():
-			if self.dic['articles'].has_key(author) == False:
-				self.dic['articles'][author] = {}
-			self.dic['articles'][author].update(new_dic[author])
-
 if __name__ == '__main__':
 	year  = datetime.date.today().timetuple()[0]
 	month = datetime.date.today().timetuple()[1]
@@ -466,7 +515,7 @@ if __name__ == '__main__':
 	program = sys.argv[0]
 	domain	= sys.argv[1]
 	# folder = 'data'
-	folder	= sys.argv[2]
+	folder	= sys.argv[2].strip('/')
 	filename = os.path.join(folder, "reddit_%s_%02d%02d.json" % (domain.split('/')[4], month, day))
 	filename_sum = os.path.join("%s_summary" % folder, "reddit_%s_summary.json" % (domain.split('/')[4]))
 
@@ -502,7 +551,7 @@ if __name__ == '__main__':
 
 	article.writeJSON(filename_sum)
 
-	with open('reddit_users.txt.1', 'a') as f:
+	with open('reddit_users.txt', 'a') as f:
 		for user in article.authors():
 			f.write("%s\n" % user)
 			for a_id in article.ids(user):
