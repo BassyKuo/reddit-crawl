@@ -17,7 +17,7 @@
 #   a    = obj.authors()[0]
 #   a_id = obj.ids(a)[0]
 #   print obj.keys('articles')
-#   print article[a][a_id]['body']
+#   print article[a][a_id]['selftext']
 # [example#2]
 #   from Reddit_crawler import *
 #   obj = RedditUser()
