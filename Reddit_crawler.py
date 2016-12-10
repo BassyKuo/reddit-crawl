@@ -91,6 +91,9 @@ def fetch_comment (comment, dic, level, num):
 	return comment
 
 def urljoin (*args):
+	"""
+	newURL = urljoin('http://www.reddit.com', 'r/', 'nosleep', '.json')    -- return url
+	"""
 	return '/'.join(s.strip('/') for s in args)
 
 class RedditObj:
