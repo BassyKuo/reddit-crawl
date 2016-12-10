@@ -310,6 +310,11 @@ class RedditObj:
 	def setitem (self, target, value, author, a_id):
 		"""
 		x.setitem('comments', comm_dic, author, a_id)    -- set the target item in RedditObj.dic['articles'][author][a_id][target]
+		[NOTICE]: It recommend you that using `x.get_dict` to modify items directly, then update the modified dictionary, forexample,
+		>> NewDict = x.get_dict()
+		>> NewDict[author][a_id]['title'] = "This is a pen."
+		>> NewDict[author][a_id]['comments'] = comment_dict
+		>> x.update(NewDict)
 		"""
 		self.dic['articles'][author][a_id][target] = value
 
