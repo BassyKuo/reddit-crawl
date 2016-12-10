@@ -1,3 +1,13 @@
+#!/bin/python 
+#####
+# Filename: Reddit_user_crawler.py
+# Author: Bassy <aaammmyyy27@gmail.com>
+# NTHU_ID: 105062633 <bassykuo@gapp.nthu.edu.tw> 
+# Date: 2016-12-10
+# Main Usage:
+#   python Reddit_user_crawler.py Amy data
+#####
+
 import sys, os
 from Reddit_crawler import RedditObj
 from Reddit_crawler import RedditUser
