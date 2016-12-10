@@ -14,3 +14,4 @@ for domain in $title_ls; do
 done
 
 sort reddit_users.txt | uniq > reddit_users_${time}.txt
+cp reddit_users_${time}.txt reddit_users.txt
