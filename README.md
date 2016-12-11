@@ -1,12 +1,14 @@
 # reddit-crawl
 
 Welcome to use REDDIT-CRAWL to crawl your own reddit.
+
 With this tool, each data you crawled came from 3 types of url in [https://www.reddit.com/](https://www.reddit.com/):
+
 1. https://www.reddit.com/r/{subreddit}
 2. https://www.reddit.com/r/{subreddit}/comments/{article_id}
 3. https://www.reddit.com/user/{username}/submitted
 
-### Usage
+# Usage
 For crawling the overview subreddit page:
 ```
 python Reddit_crawler.py https://www.reddit.com/r/{subreddit} <stroage_folder>
@@ -30,7 +32,7 @@ For example:
 ./RedditDiggerUsers.sh reddit_users.txt ^zzz     # script will find the user name match '^zzz', ex: zzz0404
 ```
 
-### API
+# API
 You can also use API directly in `Reddit_crawler.py`:
 ```
 python
