@@ -24,11 +24,12 @@ chmod +x RedditDigger*.sh
 ./RedditDigger.sh <subreddit_list> 
 ./RedditDiggerUsers.sh <user_list> [<name_expr_pattern>]
 ```
-For example:
+
+### For example:
 ```
+python Reddit_crawler.py https://www.reddit.com/r/jokes/ data/
+python Reddit_user_crawler.py zzz0404 data/
 ./RedditDigger.sh reddit_subreddit.txt
-```
-```
 ./RedditDiggerUsers.sh reddit_users.txt ^zzz     # script will find the user name match '^zzz', ex: zzz0404
 ```
 
